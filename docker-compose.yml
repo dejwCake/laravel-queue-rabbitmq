@@ -1,6 +1,8 @@
-version: '3.7'
-
 services:
+  php:
+    image: dejwcake/php8.4:1
+    volumes:
+      - .:/var/www/html:delegated
 
   rabbitmq:
     image: rabbitmq:3.8
@@ -17,8 +19,8 @@ services:
       - "./tests/files/rootCA.pem:/rootCA.pem:ro"
       - "./tests/files/rootCA.key:/rootCA.key:ro"
     ports:
-      - "15671:15671"
-      - "15672:15672"
+#      - "15671:15671"
+#      - "15672:15672"
       - "5671:5671"
       - "5672:5672"
 
@@ -39,5 +41,5 @@ services:
     ports:
       - 15671:15671
       - 15672:15672
-      - 5671:5671
-      - 5672:5672
+#      - 5671:5671
+#      - 5672:5672
