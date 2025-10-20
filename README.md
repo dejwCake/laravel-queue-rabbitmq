@@ -596,20 +596,23 @@ To run the test suite you can use the following commands:
 
 ```bash
 # To run both style and unit tests.
-composer test
+docker compose exec -it app composer install
+
+# To run both style and unit tests.
+docker compose exec -it app composer test
 
 # To run only style tests.
-composer test:style
+docker compose exec -it app composer test:style
 
 # To run only unit tests.
-composer test:unit
+docker compose exec -it app composer test:unit
 ```
 
 If you receive any errors from the style tests, you can automatically fix most,
 if not all the issues with the following command:
 
 ```bash
-composer fix:style
+docker compose exec -it php composer fix:style
 ```
 
 ## Contribution
