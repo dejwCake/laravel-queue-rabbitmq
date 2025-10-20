@@ -1,5 +1,20 @@
 services:
 
+  app:
+    build:
+      context: .
+      dockerfile: .docker/app/Dockerfile
+    environment:
+      HOST: rabbitmq
+      PORT: 5672
+    volumes:
+      - .:/app
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    depends_on:
+      - rabbitmq
+
   rabbitmq:
     image: rabbitmq:3.8
     environment:
@@ -35,18 +50,3 @@ services:
     ports:
       - 15671:15671
       - 15672:15672
-
-  php:
-    build:
-      context: .
-      dockerfile: .docker/Dockerfile
-    environment:
-      HOST: rabbitmq
-      PORT: 5672
-    volumes:
-      - .:/app
-    working_dir: /app
-    tty: true
-    stdin_open: true
-    depends_on:
-      - rabbitmq
