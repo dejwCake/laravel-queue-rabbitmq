@@ -597,13 +597,19 @@ To run the test suite you can use the following commands:
 ```bash
 # To run both style and unit tests.
 docker compose exec -it app composer install
+```
 
+```bash
 # To run both style and unit tests.
 docker compose exec -it app composer test
+```
 
+```bash
 # To run only style tests.
 docker compose exec -it app composer test:style
+```
 
+```bash
 # To run only unit tests.
 docker compose exec -it app composer test:unit
 ```
@@ -612,7 +618,7 @@ If you receive any errors from the style tests, you can automatically fix most,
 if not all the issues with the following command:
 
 ```bash
-docker compose exec -it php composer fix:style
+docker compose exec -it app composer fix:style
 ```
 
 ## Contribution
