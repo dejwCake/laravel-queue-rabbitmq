@@ -32,9 +32,6 @@ class Consumer extends Worker
     /** @var AMQPChannel */
     protected $channel;
 
-    /** @var object|null */
-    protected $currentJob;
-
     public function setContainer(Container $value): void
     {
         $this->container = $value;
@@ -96,6 +93,14 @@ class Consumer extends Worker
             $arguments['priority'] = ['I', $this->maxPriority];
         }
 
+        // Tracked locally instead of on $this to avoid two problems:
+        //   1. Illuminate\Queue\Worker::$currentJob became public in Laravel 13.7,
+        //      so redeclaring it on Consumer hits a visibility narrowing error.
+        //   2. Worker::runJob() may reset $this->currentJob to null after each job,
+        //      which made the "if (currentJob === null) sleep" branch trigger after
+        //      every successful job and starved throughput (see #661).
+        $currentJob = null;
+
         $this->channel->basic_consume(
             $queue,
             $this->consumerTag,
@@ -103,7 +108,7 @@ class Consumer extends Worker
             false,
             false,
             false,
-            function (AMQPMessage $message) use ($connection, $options, $connectionName, $queue, $jobClass, &$jobsProcessed): void {
+            function (AMQPMessage $message) use ($connection, $options, $connectionName, $queue, $jobClass, &$jobsProcessed, &$currentJob): void {
                 $job = new $jobClass(
                     $this->container,
                     $connection,
@@ -112,7 +117,7 @@ class Consumer extends Worker
                     $queue
                 );
 
-                $this->currentJob = $job;
+                $currentJob = $job;
 
                 if ($this->supportsAsyncSignals()) {
                     $this->registerTimeoutHandler($job, $options);
@@ -157,8 +162,8 @@ class Consumer extends Worker
                 $this->stopWorkerIfLostConnection($exception);
             }
 
-            // If no job is got off the queue, we will need to sleep the worker.
-            if ($this->currentJob === null) {
+            // If no job was consumed during this wait() cycle, sleep the worker.
+            if ($currentJob === null) {
                 $this->sleep($options->sleep);
             }
 
@@ -170,14 +175,14 @@ class Consumer extends Worker
                 $lastRestart,
                 $startTime,
                 $jobsProcessed,
-                $this->currentJob
+                $currentJob
             );
 
             if (! is_null($status)) {
                 return $this->stop($status, $options);
             }
 
-            $this->currentJob = null;
+            $currentJob = null;
         }
     }
 
@@ -197,14 +202,15 @@ class Consumer extends Worker
      *
      * @param  int  $status
      * @param  WorkerOptions|null  $options
+     * @param  string|null  $reason
      * @return int
      */
-    public function stop($status = 0, $options = null)
+    public function stop($status = 0, $options = null, $reason = null)
     {
         // Tell the server you are going to stop consuming.
         // It will finish up the last message and not send you any more.
         $this->channel->basic_cancel($this->consumerTag, false, true);
 
-        return parent::stop($status, $options);
+        return parent::stop($status, $options, $reason);
     }
 }

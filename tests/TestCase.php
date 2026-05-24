@@ -10,11 +10,15 @@ use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Compatibility shim for newer PHPUnit / Testbench combinations that
+     * introspect this static property during test bootstrap.
+     */
+    public static $latestResponse = null;
+
     protected function getPackageProviders($app): array
     {
-        return [
-            LaravelQueueRabbitMQServiceProvider::class,
-        ];
+        return [LaravelQueueRabbitMQServiceProvider::class];
     }
 
     protected function getEnvironmentSetUp($app): void
@@ -46,7 +50,6 @@ abstract class TestCase extends BaseTestCase
             ],
 
             'worker' => 'default',
-
         ]);
     }
 
