@@ -7,11 +7,14 @@ RabbitMQ Queue driver for Laravel
 
 ## Support Policy
 
-Only the latest version will get new features. Bug fixes will be provided using the following scheme:
+Only the latest major version (`14`) receives new features and bug fixes. It supports the following Laravel and PHP versions:
 
-| Package Version | Laravel Version | Bug Fixes Until  |                                                                                             |
-|-----------------|-----------------|------------------|---------------------------------------------------------------------------------------------|
-| 14              | 10, 11, 12      | August 8th, 2023 | [Documentation](https://github.com/vyuldashev/laravel-queue-rabbitmq/blob/master/README.md) |
+| Laravel | PHP       |
+|---------|-----------|
+| 10      | 8.1 – 8.5 |
+| 11      | 8.2 – 8.5 |
+| 12      | 8.2 – 8.5 |
+| 13      | 8.3 – 8.5 |
 
 ## Installation
 
