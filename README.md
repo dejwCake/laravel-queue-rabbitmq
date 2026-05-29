@@ -7,11 +7,14 @@ RabbitMQ Queue driver for Laravel
 
 ## Support Policy
 
-Only the latest version will get new features. Bug fixes will be provided using the following scheme:
+Only the latest major version (`14`) receives new features and bug fixes. It supports the following Laravel and PHP versions:
 
-| Package Version | Laravel Version | Bug Fixes Until  |                                                                                             |
-|-----------------|-----------------|------------------|---------------------------------------------------------------------------------------------|
-| 14              | 10, 11, 12      | August 8th, 2023 | [Documentation](https://github.com/vyuldashev/laravel-queue-rabbitmq/blob/master/README.md) |
+| Laravel | PHP       |
+|---------|-----------|
+| 10      | 8.1 – 8.5 |
+| 11      | 8.2 – 8.5 |
+| 12      | 8.2 – 8.5 |
+| 13      | 8.3 – 8.5 |
 
 ## Installation
 
@@ -403,7 +406,7 @@ class RabbitMQQueue extends BaseRabbitMQQueue
 ### Default Queue
 
 The connection does use a default queue with value 'default', when no queue is provided by laravel.
-It is possible to change te default queue by adding an extra parameter in the connection config.
+It is possible to change the default queue by adding an extra parameter in the connection config.
 
 ```php
 'connections' => [
@@ -529,6 +532,33 @@ Available protocols : `tcp`, `ssl`, `tls`
 ],
 ```
 
+### Network Timeouts
+
+For network timeouts configuration you can use option parameters.
+All float values are in seconds and zero value can mean infinite timeout.
+Example contains default values.
+
+```php
+'connections' => [
+    // ...
+
+    'rabbitmq' => [
+        // ...
+
+        'options' => [
+            // ...
+
+            'connection_timeout' => 3.0,
+            'read_timeout' => 3.0,
+            'write_timeout' => 3.0,
+            'channel_rpc_timeout' => 0.0,
+        ],
+    ],
+
+    // ...
+],
+```
+
 ### Octane support
 
 Starting with 13.3.0, this package supports [Laravel Octane](https://laravel.com/docs/octane) out of the box.
@@ -569,20 +599,29 @@ To run the test suite you can use the following commands:
 
 ```bash
 # To run both style and unit tests.
-composer test
+docker compose exec -it app composer install
+```
 
+```bash
+# To run both style and unit tests.
+docker compose exec -it app composer test
+```
+
+```bash
 # To run only style tests.
-composer test:style
+docker compose exec -it app composer test:style
+```
 
+```bash
 # To run only unit tests.
-composer test:unit
+docker compose exec -it app composer test:unit
 ```
 
 If you receive any errors from the style tests, you can automatically fix most,
 if not all the issues with the following command:
 
 ```bash
-composer fix:style
+docker compose exec -it app composer fix:style
 ```
 
 ## Contribution

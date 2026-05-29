@@ -10,11 +10,15 @@ use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Compatibility shim for newer PHPUnit / Testbench combinations that
+     * introspect this static property during test bootstrap.
+     */
+    public static $latestResponse = null;
+
     protected function getPackageProviders($app): array
     {
-        return [
-            LaravelQueueRabbitMQServiceProvider::class,
-        ];
+        return [LaravelQueueRabbitMQServiceProvider::class];
     }
 
     protected function getEnvironmentSetUp($app): void
@@ -40,17 +44,16 @@ abstract class TestCase extends BaseTestCase
                     'cafile' => null,
                     'local_cert' => null,
                     'local_key' => null,
-                    'verify_peer' => true,
+                    'verify_peer' => false,
                     'passphrase' => null,
                 ],
             ],
 
             'worker' => 'default',
-
         ]);
     }
 
-    protected function connection(string $name = null): RabbitMQQueue
+    protected function connection(?string $name = null): RabbitMQQueue
     {
         return Queue::connection($name);
     }

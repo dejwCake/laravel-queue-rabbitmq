@@ -6,8 +6,12 @@ use PhpAmqpLib\Connection\AMQPSSLConnection;
 
 class SslQueueTest extends TestCase
 {
-    public function setUp(): void
+    protected bool $interactsWithConnection = false;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->markTestSkipped();
     }
 
