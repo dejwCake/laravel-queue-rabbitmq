@@ -200,9 +200,16 @@ class Consumer extends Worker
     /**
      * Stop listening and bail out of the script.
      *
+     * Laravel 10 takes two arguments here, 11 and 12 take three, and 13 added
+     * $connectionName and $queue so WorkerStopping can carry them. Forwarding all
+     * five is safe on every one of them: PHP ignores the surplus positional
+     * arguments on the older signatures.
+     *
      * @param  int  $status
      * @param  WorkerOptions|null  $options
      * @param  string|null  $reason
+     * @param  string|null  $connectionName
+     * @param  string|null  $queue
      * @return int
      */
     public function stop($status = 0, $options = null, $reason = null, $connectionName = null, $queue = null)
@@ -211,6 +218,6 @@ class Consumer extends Worker
         // It will finish up the last message and not send you any more.
         $this->channel->basic_cancel($this->consumerTag, false, true);
 
-        return parent::stop($status, $options, $reason);
+        return parent::stop($status, $options, $reason, $connectionName, $queue);
     }
 }

@@ -1,4 +1,8 @@
-FROM php:8.4-cli
+# The PHP version is a build arg so CI can run the suite across the versions the
+# package supports. Keep the default in sync with docker-compose.yml.
+ARG PHP_VERSION=8.4
+
+FROM php:${PHP_VERSION}-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \

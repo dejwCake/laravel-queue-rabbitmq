@@ -8,6 +8,8 @@ services:
     build:
       context: .
       dockerfile: .docker/app/Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.4}
     environment:
       HOST: rabbitmq
       PORT: 5672

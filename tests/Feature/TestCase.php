@@ -51,7 +51,7 @@ abstract class TestCase extends BaseTestCase
 
     public function testSizeDoesNotThrowExceptionOnUnknownQueue(): void
     {
-        $this->assertEmpty(0, Queue::size(Str::random()));
+        $this->assertSame(0, Queue::size(Str::random()));
     }
 
     public function testPopNothing(): void
