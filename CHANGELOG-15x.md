@@ -15,5 +15,8 @@ Behaviour changes — check your process manager (Supervisor, systemd, Kubernete
 - Composer: the PHP constraint is now `^8.1`, the minimum of every supported Laravel version (it said `^8.0`, which could never resolve).
 - Dev: added Composer normalization, PHP 8.1+ compatibility (phpcs), phpstan and phpmd checks next to Pint, run in CI and documented in the README. phpstan and phpmd start from a baseline of the existing findings.
 
+## [15.0.1]
+- Fix: `Consumer::stop()` forwards the connection name and queue to `Worker::stop()` on Laravel 13.
+
 ## [15.0.0]
 - First release compatible with Laravel 13
