@@ -1,6 +1,11 @@
 services:
   php:
-    image: dejwcake/php8.4:1
+    image: dejwcake/php8.5:1
+    volumes:
+      - .:/var/www/html:delegated
+
+  php-qa:
+    image: dejwcake/phpqa8.5:1
     volumes:
       - .:/var/www/html:delegated
 
@@ -9,7 +14,7 @@ services:
       context: .
       dockerfile: .docker/app/Dockerfile
       args:
-        PHP_VERSION: ${PHP_VERSION:-8.4}
+        PHP_VERSION: ${PHP_VERSION:-8.5}
     environment:
       HOST: rabbitmq
       PORT: 5672

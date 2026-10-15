@@ -7,3 +7,6 @@ phpunit.xml
 .phpunit.*
 .php_cs.cache
 .phpunit.cache
+.phpstan.cache/
+.phpcs.cache
+.phpmd.result-cache.php

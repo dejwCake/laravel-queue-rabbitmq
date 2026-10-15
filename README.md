@@ -1,7 +1,7 @@
 RabbitMQ Queue driver for Laravel
 ======================
 [![Latest Stable Version](https://poser.pugx.org/vladimir-yuldashev/laravel-queue-rabbitmq/v/stable?format=flat-square)](https://packagist.org/packages/vladimir-yuldashev/laravel-queue-rabbitmq)
-[![Build Status](https://github.com/vyuldashev/laravel-queue-rabbitmq/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/vyuldashev/laravel-queue-rabbitmq/actions/workflows/tests.yml)
+[![Build Status](https://github.com/dejwCake/laravel-queue-rabbitmq/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/dejwCake/laravel-queue-rabbitmq/actions/workflows/ci.yml)
 [![Total Downloads](https://poser.pugx.org/vladimir-yuldashev/laravel-queue-rabbitmq/downloads?format=flat-square)](https://packagist.org/packages/vladimir-yuldashev/laravel-queue-rabbitmq)
 [![License](https://poser.pugx.org/vladimir-yuldashev/laravel-queue-rabbitmq/license?format=flat-square)](https://packagist.org/packages/vladimir-yuldashev/laravel-queue-rabbitmq)
 
@@ -587,41 +587,110 @@ There are two ways of consuming messages.
 
 2. `rabbitmq:consume` command which is provided by this package. This command utilizes `basic_consume` and is more performant than `basic_get` by ~2x, but does not support multiple queues.
 
-## Testing
+## How to develop this project
 
-Setup RabbitMQ using `docker-compose`:
+Tests run in the `app` container against the `rabbitmq` container, exactly as CI does. Static analysis runs in the
+`php-qa` container, which reuses the dependencies installed by `app`.
 
-```bash
-docker compose up -d
+### Containers
+
+Start the containers (RabbitMQ is required by the functional tests):
+```shell
+docker compose up -d --build app rabbitmq
 ```
 
-To run the test suite you can use the following commands:
-
-```bash
-# To run both style and unit tests.
-docker compose exec -it app composer install
+Use another PHP version (8.1–8.5):
+```shell
+PHP_VERSION=8.3 docker compose up -d --build app rabbitmq
 ```
 
-```bash
-# To run both style and unit tests.
-docker compose exec -it app composer test
+### Composer
+
+Update dependencies:
+```shell
+docker compose exec -it app composer update
 ```
 
-```bash
-# To run only style tests.
+Composer normalization:
+```shell
+docker compose run -it --rm php-qa composer normalize
+```
+
+### Run code analysis tools
+
+PHP compatibility (8.1 and newer):
+```shell
+docker compose run -it --rm php-qa phpcs --standard=.phpcs.compatibility.xml --cache=.phpcs.cache
+```
+
+Code style (Pint):
+```shell
 docker compose exec -it app composer test:style
 ```
 
-```bash
-# To run only unit tests.
+Fix style issues (Pint):
+```shell
+docker compose exec -it app composer fix:style
+```
+
+Static analysis (phpstan):
+```shell
+docker compose run -it --rm php-qa phpstan analyse --configuration=phpstan.neon
+```
+
+Regenerate the phpstan baseline:
+```shell
+docker compose run -it --rm php-qa phpstan analyse --configuration=phpstan.neon --generate-baseline=phpstan-baseline.neon
+```
+
+Mess detector (phpmd):
+```shell
+docker compose run -it --rm php-qa phpmd analyze
+```
+
+Regenerate the phpmd baseline:
+```shell
+docker compose run -it --rm php-qa phpmd analyze --generate-baseline
+```
+
+### Run tests
+
+Run the test suite:
+```shell
 docker compose exec -it app composer test:unit
 ```
 
-If you receive any errors from the style tests, you can automatically fix most,
-if not all the issues with the following command:
+Run a single test class or method:
+```shell
+docker compose exec -it app ./vendor/bin/phpunit --filter ConsumeCommandTest
+```
 
-```bash
-docker compose exec -it app composer fix:style
+### Run tests against another Laravel version
+
+CI runs the suite on every Laravel line with both lowest and stable dependencies, plus the Laravel 13 releases right
+before `Illuminate\Queue\Worker` changed signatures (`13.17.*`, `13.30.*`). To reproduce one of those jobs, update to
+the version and run the tests:
+```shell
+docker compose exec -it app composer update --with="laravel/framework:13.30.*" --prefer-stable --no-security-blocking \
+  && docker compose exec -it app composer test:unit
+```
+
+Use `--prefer-lowest` instead of `--prefer-stable` for the lowest dependencies, e.g. `--with="laravel/framework:^13.0"`
+installs 13.0.0. `--no-security-blocking` is needed because Composer refuses Laravel releases with security advisories,
+which covers every 13.x before 13.30.0. Go back to the latest dependencies afterwards with `composer update`.
+
+### Run the whole suite
+
+Run every check and the test suite in sequence on the latest dependencies (stops at the first failure):
+```shell
+docker compose up -d --build app rabbitmq \
+  && docker compose exec -it app composer update \
+  && docker compose run -it --rm php-qa composer normalize \
+  && docker compose run -it --rm php-qa phpcs --standard=.phpcs.compatibility.xml --cache=.phpcs.cache \
+  && docker compose exec -it app composer test:style \
+  && docker compose run -it --rm php-qa phpstan analyse --configuration=phpstan.neon \
+  && docker compose run -it --rm php-qa phpmd analyze \
+  && docker compose exec -it app composer test:unit
 ```
 
 ## Contribution

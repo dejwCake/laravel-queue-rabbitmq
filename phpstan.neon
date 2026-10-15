@@ -1,0 +1,23 @@
+includes:
+	- phpstan-baseline.neon
+
+parameters:
+    level: 5
+    # The supported PHP range, see the support policy in README.md
+    phpVersion:
+        min: 80100
+        max: 80599
+    reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
+    type_coverage:
+        return: 75
+        param: 75
+        property: 75
+        constant: 75
+
+    tmpDir: .phpstan.cache
+
+    paths:
+        - ./config
+        - ./src
+        - ./tests

@@ -1,0 +1,14 @@
+# PHPMD configuration, see https://phpmd.org/documentation/creating-a-ruleset.html
+name: 'Package PHPMD ruleset'
+paths:
+  - config
+  - src
+  - tests
+format: ansi
+suffixes:
+  - php
+baseline-file: phpmd.baseline.xml
+rules:
+  - ref: rulesets/codesize.xml
+  - ref: rulesets/controversial.xml
+  - ref: rulesets/design.xml

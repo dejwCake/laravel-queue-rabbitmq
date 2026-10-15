@@ -22,24 +22,66 @@ jobs:
       - name: Check code style
         run: docker compose run --rm --no-deps -T php composer test:style
 
+  qa:
+    name: 'QA: ${{ matrix.name }}'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Composer normalize
+            command: composer normalize --dry-run
+          - name: PHP compatibility
+            command: phpcs --standard=.phpcs.compatibility.xml --cache=.phpcs.cache
+          - name: PHPStan
+            command: phpstan analyse --configuration=phpstan.neon --no-progress --memory-limit=1G
+          - name: PHPMD
+            command: phpmd analyze --no-progress --format=github
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install dependencies
+        run: >-
+          docker compose run --rm --no-deps -T php
+          composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Run ${{ matrix.name }}
+        run: docker compose run --rm --no-deps -T php-qa ${{ matrix.command }}
+
   tests:
     name: 'PHP ${{ matrix.php }} - Laravel: ${{ matrix.laravel }} - ${{ matrix.stability }}'
-    needs: [pint]
+    needs: [pint, qa]
     runs-on: ubuntu-latest
+    # A consumer that misreads the Worker hooks loops forever instead of failing.
+    timeout-minutes: 15
 
     strategy:
       fail-fast: true
       matrix:
         php: ['8.1', '8.2', '8.3', '8.4', '8.5']
         stability: ['prefer-lowest', 'prefer-stable']
-        laravel: ['^10.0', '^11.0', '^12.0', '^13.0']
+        # 13.17.* and 13.30.* pin the last releases before Worker::stopIfNecessary()
+        # (13.18.0) and Worker::registerTimeoutHandler() (13.31.0) changed signature;
+        # prefer-lowest on ^13.0 covers 13.0.0.
+        laravel: ['^10.0', '^11.0', '^12.0', '13.17.*', '13.30.*', '^13.0']
         exclude:
           - php: '8.1'
             laravel: '^11.0'
           - php: '8.1'
             laravel: '^12.0'
           - php: '8.1'
+            laravel: '13.17.*'
+          - php: '8.1'
+            laravel: '13.30.*'
+          - php: '8.1'
             laravel: '^13.0'
+          - php: '8.2'
+            laravel: '13.17.*'
+          - php: '8.2'
+            laravel: '13.30.*'
           - php: '8.2'
             laravel: '^13.0'
 
@@ -57,7 +99,7 @@ jobs:
         run: >-
           docker compose exec -T app
           composer update --with="laravel/framework:${{ matrix.laravel }}"
-          --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+          --${{ matrix.stability }} --no-security-blocking --prefer-dist --no-interaction --no-progress
 
       - name: Wait for RabbitMQ
         run: >-

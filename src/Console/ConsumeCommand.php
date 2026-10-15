@@ -53,7 +53,10 @@ class ConsumeCommand extends WorkCommand
         return $options;
     }
 
-    public function handle(): void
+    /**
+     * @return int|null
+     */
+    public function handle()
     {
         /** @var Consumer $consumer */
         $consumer = $this->worker;
@@ -65,7 +68,7 @@ class ConsumeCommand extends WorkCommand
         $consumer->setPrefetchSize((int) $this->option('prefetch-size'));
         $consumer->setPrefetchCount((int) $this->option('prefetch-count'));
 
-        parent::handle();
+        return parent::handle();
     }
 
     protected function consumerTag(): string

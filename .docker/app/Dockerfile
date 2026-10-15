@@ -1,6 +1,6 @@
 # The PHP version is a build arg so CI can run the suite across the versions the
 # package supports. Keep the default in sync with docker-compose.yml.
-ARG PHP_VERSION=8.4
+ARG PHP_VERSION=8.5
 
 FROM php:${PHP_VERSION}-cli
 

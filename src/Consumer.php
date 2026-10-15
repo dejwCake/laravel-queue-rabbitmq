@@ -4,11 +4,13 @@ namespace VladimirYuldashev\LaravelQueueRabbitMQ;
 
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use PhpAmqpLib\Message\AMQPMessage;
+use ReflectionMethod;
 use Throwable;
 use VladimirYuldashev\LaravelQueueRabbitMQ\Queue\RabbitMQQueue;
 
@@ -31,6 +33,9 @@ class Consumer extends Worker
 
     /** @var AMQPChannel */
     protected $channel;
+
+    /** @var bool|null */
+    protected $timeoutHandlerExpectsQueue;
 
     public function setContainer(Container $value): void
     {
@@ -69,12 +74,12 @@ class Consumer extends Worker
     public function daemon($connectionName, $queue, WorkerOptions $options)
     {
         if ($this->supportsAsyncSignals()) {
-            $this->listenForSignals();
+            $this->listenForSignals($connectionName, $queue, $options);
         }
 
         $lastRestart = $this->getTimestampOfLastQueueRestart();
 
-        [$startTime, $jobsProcessed] = [hrtime(true) / 1e9, 0];
+        [$startTime, $jobsProcessed, $lastJobProcessedAt] = [hrtime(true) / 1e9, 0, null];
 
         /** @var RabbitMQQueue $connection */
         $connection = $this->manager->connection($connectionName);
@@ -108,7 +113,7 @@ class Consumer extends Worker
             false,
             false,
             false,
-            function (AMQPMessage $message) use ($connection, $options, $connectionName, $queue, $jobClass, &$jobsProcessed, &$currentJob): void {
+            function (AMQPMessage $message) use ($connection, $options, $connectionName, $queue, $jobClass, &$jobsProcessed, &$lastJobProcessedAt, &$currentJob): void {
                 $job = new $jobClass(
                     $this->container,
                     $connection,
@@ -120,12 +125,14 @@ class Consumer extends Worker
                 $currentJob = $job;
 
                 if ($this->supportsAsyncSignals()) {
-                    $this->registerTimeoutHandler($job, $options);
+                    $this->registerJobTimeoutHandler($connectionName, $queue, $job, $options);
                 }
 
                 $jobsProcessed++;
 
                 $this->runJob($job, $connectionName, $options);
+
+                $lastJobProcessedAt = hrtime(true) / 1e9;
 
                 if ($this->supportsAsyncSignals()) {
                     $this->resetTimeoutHandler();
@@ -144,7 +151,13 @@ class Consumer extends Worker
             // if it is we will just pause this worker for a given amount of time and
             // make sure we do not need to kill this worker process off completely.
             if (! $this->daemonShouldRun($options, $connectionName, $queue)) {
-                $this->pauseWorker($options, $lastRestart);
+                $this->sleep($options->sleep > 0 ? $options->sleep : 1);
+
+                $stop = $this->stopStatus($options, $lastRestart, $startTime, $jobsProcessed, null, $lastJobProcessedAt);
+
+                if (! is_null($stop)) {
+                    return $this->stop($stop[0], $options, $stop[1], $connectionName, $queue);
+                }
 
                 continue;
             }
@@ -155,7 +168,7 @@ class Consumer extends Worker
             } catch (AMQPRuntimeException $exception) {
                 $this->exceptions->report($exception);
 
-                $this->kill(self::EXIT_ERROR, $options);
+                $this->kill(self::EXIT_ERROR, $options, null, $connectionName, $queue);
             } catch (Exception|Throwable $exception) {
                 $this->exceptions->report($exception);
 
@@ -170,16 +183,17 @@ class Consumer extends Worker
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
-            $status = $this->stopIfNecessary(
+            $stop = $this->stopStatus(
                 $options,
                 $lastRestart,
                 $startTime,
                 $jobsProcessed,
-                $currentJob
+                $currentJob,
+                $lastJobProcessedAt
             );
 
-            if (! is_null($status)) {
-                return $this->stop($status, $options);
+            if (! is_null($stop)) {
+                return $this->stop($stop[0], $options, $stop[1], $connectionName, $queue);
             }
 
             $currentJob = null;
@@ -198,16 +212,81 @@ class Consumer extends Worker
     }
 
     /**
+     * Register the timeout handler for a job about to be processed.
+     *
+     * Worker::registerTimeoutHandler() takes ($job, $options) up to Laravel 13.30 and
+     * ($connectionName, $queue, $job, $options) from 13.31.0 on. Unlike stop(),
+     * the new parameters were *prepended*, so forwarding the surplus is not safe —
+     * $connectionName would land on $job and $queue on WorkerOptions. Hence the
+     * parent arity decides the call.
+     *
+     * @param  string  $connectionName
+     * @param  string  $queue
+     * @param  Job  $job
+     * @return void
+     */
+    protected function registerJobTimeoutHandler($connectionName, $queue, $job, WorkerOptions $options)
+    {
+        if ($this->timeoutHandlerExpectsQueue === null) {
+            $this->timeoutHandlerExpectsQueue = (new ReflectionMethod(Worker::class, 'registerTimeoutHandler'))
+                ->getNumberOfParameters() > 2;
+        }
+
+        if ($this->timeoutHandlerExpectsQueue) {
+            $this->registerTimeoutHandler($connectionName, $queue, $job, $options);
+
+            return;
+        }
+
+        $this->registerTimeoutHandler($job, $options);
+    }
+
+    /**
+     * Determine whether the worker should stop, and why.
+     *
+     * Worker::stopIfNecessary() returns a bare exit code up to Laravel 12 and a
+     * [status, WorkerStopReason] pair from 13.0. Its counters moved as well: 13.10
+     * appended $lastJobProcessedAt, and 13.18.0 dropped both counter parameters for
+     * the $jobsProcessed / $lastJobProcessedAt properties, which stop() also reports
+     * on WorkerStopping. On 13.18+ the counters are therefore synced onto the worker
+     * and $job moves up to the fourth slot.
+     *
+     * @param  int|null  $lastRestart
+     * @param  float  $startTime
+     * @param  int  $jobsProcessed
+     * @param  Job|null  $job
+     * @param  float|null  $lastJobProcessedAt
+     * @return array{0: int, 1: mixed}|null
+     */
+    protected function stopStatus(WorkerOptions $options, $lastRestart, $startTime, $jobsProcessed, $job, $lastJobProcessedAt): ?array
+    {
+        if (property_exists(Worker::class, 'jobsProcessed')) {
+            $this->jobsProcessed = $jobsProcessed;
+            $this->lastJobProcessedAt = $lastJobProcessedAt;
+
+            $status = $this->stopIfNecessary($options, $lastRestart, $startTime, $job);
+        } else {
+            $status = $this->stopIfNecessary($options, $lastRestart, $startTime, $jobsProcessed, $job, $lastJobProcessedAt);
+        }
+
+        if (is_null($status)) {
+            return null;
+        }
+
+        return is_array($status) ? $status : [$status, null];
+    }
+
+    /**
      * Stop listening and bail out of the script.
      *
-     * Laravel 10 takes two arguments here, 11 and 12 take three, and 13 added
-     * $connectionName and $queue so WorkerStopping can carry them. Forwarding all
-     * five is safe on every one of them: PHP ignores the surplus positional
+     * Laravel 10–12 take ($status, $options) here, 13.0 added $reason and 13.31.0
+     * added $connectionName and $queue so WorkerStopping can carry them. Forwarding
+     * all five is safe on every one of them: PHP ignores the surplus positional
      * arguments on the older signatures.
      *
      * @param  int  $status
      * @param  WorkerOptions|null  $options
-     * @param  string|null  $reason
+     * @param  mixed  $reason
      * @param  string|null  $connectionName
      * @param  string|null  $queue
      * @return int

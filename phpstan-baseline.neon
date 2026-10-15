@@ -1,0 +1,346 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Out of 11 possible constant types, only 0 \- 0\.0 %% actually have it\. Add more constant types to get over 75 %%$#'
+			identifier: typeCoverage.constantTypeCoverage
+			count: 2
+			path: src/Console/ConsumeCommand.php
+
+		-
+			message: '#^Parameter \#1 \$value of method VladimirYuldashev\\LaravelQueueRabbitMQ\\Consumer\:\:setContainer\(\) expects Illuminate\\Container\\Container, Illuminate\\Contracts\\Foundation\\Application given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console/ConsumeCommand.php
+
+		-
+			message: '#^Dead catch \- Exception is never thrown in the try block\.$#'
+			identifier: catch.neverThrown
+			count: 1
+			path: src/Consumer.php
+
+		-
+			message: '#^Method Illuminate\\Queue\\Worker\:\:registerTimeoutHandler\(\) invoked with 2 parameters, 4 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Consumer.php
+
+		-
+			message: '#^Method Illuminate\\Queue\\Worker\:\:stopIfNecessary\(\) invoked with 6 parameters, 2\-4 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Consumer.php
+
+		-
+			message: '#^Method VladimirYuldashev\\LaravelQueueRabbitMQ\\Consumer\:\:daemon\(\) should return int but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Consumer.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 8
+			path: src/Consumer.php
+
+		-
+			message: '#^Out of 54 possible property types, only 40 \- 74\.0 %% actually have it\. Add more property types to get over 75 %%$#'
+			identifier: typeCoverage.propertyTypeCoverage
+			count: 7
+			path: src/Consumer.php
+
+		-
+			message: '#^Parameter \#1 \$connectionName of method Illuminate\\Queue\\Worker\:\:registerTimeoutHandler\(\) expects string\|null, Illuminate\\Contracts\\Queue\\Job given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Consumer.php
+
+		-
+			message: '#^Parameter \#2 \$queue of method Illuminate\\Queue\\Worker\:\:registerTimeoutHandler\(\) expects string\|null, Illuminate\\Queue\\WorkerOptions given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Consumer.php
+
+		-
+			message: '#^Out of 54 possible property types, only 40 \- 74\.0 %% actually have it\. Add more property types to get over 75 %%$#'
+			identifier: typeCoverage.propertyTypeCoverage
+			count: 1
+			path: src/Horizon/Listeners/RabbitMQFailedEvent.php
+
+		-
+			message: '#^Parameter \#1 \$exception of class Laravel\\Horizon\\Events\\JobFailed constructor expects Exception, Throwable given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Horizon/Listeners/RabbitMQFailedEvent.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 5
+			path: src/Horizon/RabbitMQQueue.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 1
+			path: src/LaravelQueueRabbitMQServiceProvider.php
+
+		-
+			message: '''
+				#^Call to deprecated method setNetworkProtocol\(\) of class PhpAmqpLib\\Connection\\AMQPConnectionConfig\:
+				Use setIsSecure\(\) and setSslCryptoMethod\(\)$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Queue/Connection/ConfigFactory.php
+
+		-
+			message: '#^Out of 11 possible constant types, only 0 \- 0\.0 %% actually have it\. Add more constant types to get over 75 %%$#'
+			identifier: typeCoverage.constantTypeCoverage
+			count: 2
+			path: src/Queue/Connection/ConfigFactory.php
+
+		-
+			message: '''
+				#^Access to constant on deprecated class PhpAmqpLib\\Connection\\AMQPLazyConnection\:
+				AMQPStreamConnection can be lazy too\. Use AMQPConnectionFactory with AMQPConnectionConfig\:\:setIsLazy\(true\)$#
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 2
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '''
+				#^Access to constant on deprecated class PhpAmqpLib\\Connection\\AMQPLazySSLConnection\:
+				AMQPLazySSLConnection can be lazy too\. Use AMQPConnectionFactory with AMQPConnectionConfig\:\:setIsLazy\(true\)$#
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '''
+				#^Access to constant on deprecated class PhpAmqpLib\\Connection\\AMQPLazySocketConnection\:
+				AMQPSocketConnection can be lazy too\. Use AMQPConnectionFactory with AMQPConnectionConfig\:\:setIsLazy\(true\)$#
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '''
+				#^Access to constant on deprecated class PhpAmqpLib\\Connection\\AMQPSSLConnection\:
+				Use AMQPConnectionFactory with AMQPConnectionConfig\:\:setIsSecure\(true\) and AMQPConnectionConfig\:\:setSsl\* methods\.$#
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '''
+				#^Call to deprecated method _createLazyConnection\(\) of class VladimirYuldashev\\LaravelQueueRabbitMQ\\Queue\\Connection\\ConnectionFactory\:
+				This is the fallback method, update your config asap\. \(example\: connection \=\> 'default'\)$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '''
+				#^Call to deprecated method getNetworkProtocol\(\) of class PhpAmqpLib\\Connection\\AMQPConnectionConfig\:
+				Use getSslCryptoMethod\(\)$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '#^Out of 11 possible constant types, only 0 \- 0\.0 %% actually have it\. Add more constant types to get over 75 %%$#'
+			identifier: typeCoverage.constantTypeCoverage
+			count: 6
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 9
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '#^PHPDoc tag @return with type mixed is not subtype of native type PhpAmqpLib\\Connection\\AbstractConnection\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: src/Queue/Connection/ConnectionFactory.php
+
+		-
+			message: '#^Out of 54 possible property types, only 40 \- 74\.0 %% actually have it\. Add more property types to get over 75 %%$#'
+			identifier: typeCoverage.propertyTypeCoverage
+			count: 3
+			path: src/Queue/Jobs/RabbitMQJob.php
+
+		-
+			message: '#^Variable \$headers in PHPDoc tag @var does not exist\.$#'
+			identifier: varTag.variableNotFound
+			count: 1
+			path: src/Queue/Jobs/RabbitMQJob.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 6
+			path: src/Queue/QueueConfig.php
+
+		-
+			message: '#^Out of 11 possible constant types, only 0 \- 0\.0 %% actually have it\. Add more constant types to get over 75 %%$#'
+			identifier: typeCoverage.constantTypeCoverage
+			count: 1
+			path: src/Queue/QueueConfigFactory.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 20
+			path: src/Queue/RabbitMQQueue.php
+
+		-
+			message: '#^Variable \$message in PHPDoc tag @var does not exist\.$#'
+			identifier: varTag.variableNotFound
+			count: 1
+			path: src/Queue/RabbitMQQueue.php
+
+		-
+			message: '''
+				#^Access to constant on deprecated class PhpAmqpLib\\Connection\\AMQPLazyConnection\:
+				AMQPStreamConnection can be lazy too\. Use AMQPConnectionFactory with AMQPConnectionConfig\:\:setIsLazy\(true\)$#
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 2
+			path: tests/Feature/ConnectorTest.php
+
+		-
+			message: '''
+				#^Access to constant on deprecated class PhpAmqpLib\\Connection\\AMQPSSLConnection\:
+				Use AMQPConnectionFactory with AMQPConnectionConfig\:\:setIsSecure\(true\) and AMQPConnectionConfig\:\:setSsl\* methods\.$#
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: tests/Feature/ConnectorTest.php
+
+		-
+			message: '#^Call to an undefined method PhpAmqpLib\\Connection\\AMQPSSLConnection\:\:getConfig\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Feature/ConnectorTest.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: tests/Feature/ConnectorTest.php
+
+		-
+			message: '''
+				#^Access to constant on deprecated class PhpAmqpLib\\Connection\\AMQPSSLConnection\:
+				Use AMQPConnectionFactory with AMQPConnectionConfig\:\:setIsSecure\(true\) and AMQPConnectionConfig\:\:setSsl\* methods\.$#
+			'''
+			identifier: classConstant.deprecatedClass
+			count: 1
+			path: tests/Feature/SslQueueTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''VladimirYuldashev\\\\LaravelQueueRabbitMQ\\\\Queue\\\\Jobs\\\\RabbitMQJob'' and \*NEVER\* will always evaluate to false\.$#'
+			identifier: method.impossibleType
+			count: 3
+			path: tests/Feature/TestCase.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertNotNull\(\) with mixed will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 2
+			path: tests/Feature/TestCase.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertNotNull\(\) with null will always evaluate to false\.$#'
+			identifier: method.impossibleType
+			count: 5
+			path: tests/Feature/TestCase.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 2
+			path: tests/Feature/TestCase.php
+
+		-
+			message: '#^You should use assertTrue\(\) instead of assertSame\(\) when expecting "true"$#'
+			identifier: phpunit.assertTrue
+			count: 2
+			path: tests/Feature/TestCase.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''VladimirYuldashev\\\\LaravelQueueRabbitMQ\\\\Queue\\\\RabbitMQQueue'' and VladimirYuldashev\\LaravelQueueRabbitMQ\\Queue\\RabbitMQQueue will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 3
+			path: tests/Functional/RabbitMQQueueTest.php
+
+		-
+			message: '#^Parameter \#1 \$array \(array\{\}\) to function array_values is empty, call has no effect\.$#'
+			identifier: arrayValues.empty
+			count: 2
+			path: tests/Functional/RabbitMQQueueTest.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 2
+			path: tests/Functional/TestCase.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 1
+			path: tests/Mocks/TestEncryptedJob.php
+
+		-
+			message: '#^Out of 54 possible property types, only 40 \- 74\.0 %% actually have it\. Add more property types to get over 75 %%$#'
+			identifier: typeCoverage.propertyTypeCoverage
+			count: 1
+			path: tests/Mocks/TestEncryptedJob.php
+
+		-
+			message: '#^Out of 168 possible param types, only 113 \- 67\.2 %% actually have it\. Add more param types to get over 75 %%$#'
+			identifier: typeCoverage.paramTypeCoverage
+			count: 1
+			path: tests/Mocks/TestJob.php
+
+		-
+			message: '#^Out of 54 possible property types, only 40 \- 74\.0 %% actually have it\. Add more property types to get over 75 %%$#'
+			identifier: typeCoverage.propertyTypeCoverage
+			count: 1
+			path: tests/Mocks/TestJob.php
+
+		-
+			message: '''
+				#^Class VladimirYuldashev\\LaravelQueueRabbitMQ\\Tests\\Mocks\\TestSSLConnection extends deprecated class PhpAmqpLib\\Connection\\AMQPSSLConnection\:
+				Use AMQPConnectionFactory with AMQPConnectionConfig\:\:setIsSecure\(true\) and AMQPConnectionConfig\:\:setSsl\* methods\.$#
+			'''
+			identifier: class.extendsDeprecatedClass
+			count: 1
+			path: tests/Mocks/TestSSLConnection.php
+
+		-
+			message: '#^Method VladimirYuldashev\\LaravelQueueRabbitMQ\\Tests\\TestCase\:\:connection\(\) should return VladimirYuldashev\\LaravelQueueRabbitMQ\\Queue\\RabbitMQQueue but returns Illuminate\\Contracts\\Queue\\Queue\.$#'
+			identifier: return.type
+			count: 1
+			path: tests/TestCase.php
+
+		-
+			message: '#^Out of 54 possible property types, only 40 \- 74\.0 %% actually have it\. Add more property types to get over 75 %%$#'
+			identifier: typeCoverage.propertyTypeCoverage
+			count: 1
+			path: tests/TestCase.php

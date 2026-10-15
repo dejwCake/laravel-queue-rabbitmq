@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<phpmd-baseline>
+  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/Consumer.php" method="daemon"/>
+  <violation rule="PHPMD\Rule\Design\NPathComplexity" file="src/Consumer.php" method="daemon"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveMethodLength" file="src/Consumer.php" method="daemon"/>
+  <violation rule="PHPMD\Rule\Controversial\CamelCaseMethodName" file="src/Queue/Connection/ConnectionFactory.php" method="_createLazyConnection"/>
+  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/Queue/QueueConfigFactory.php" method="getOptionsFromConfig"/>
+  <violation rule="PHPMD\Rule\Design\NPathComplexity" file="src/Queue/QueueConfigFactory.php" method="getOptionsFromConfig"/>
+  <violation rule="PHPMD\Rule\Design\TooManyMethods" file="src/Queue/RabbitMQQueue.php"/>
+  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="src/Queue/RabbitMQQueue.php"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveClassComplexity" file="src/Queue/RabbitMQQueue.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/Queue/RabbitMQQueue.php"/>
+  <violation rule="PHPMD\Rule\Controversial\CamelCaseParameterName" file="src/Queue/RabbitMQQueue.php" method="deleteQueue"/>
+  <violation rule="PHPMD\Rule\Controversial\CamelCaseVariableName" file="src/Queue/RabbitMQQueue.php"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveMethodLength" file="tests/Functional/TestCase.php" method="getEnvironmentSetUp"/>
+</phpmd-baseline>
