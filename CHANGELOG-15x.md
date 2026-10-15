@@ -12,6 +12,7 @@ Behaviour changes — check your process manager (Supervisor, systemd, Kubernete
 - Fix: on Laravel 13.18.0+ `--max-jobs`, `--stop-when-empty` and `--stop-when-empty-for` never stopped the consumer, because `Worker::stopIfNecessary()` dropped its `$jobsProcessed` parameter for worker properties. The counters are now synced onto the worker, so `WorkerStopping` also reports them.
 - Fix: on Laravel 13 the consumer passed the `[status, WorkerStopReason]` pair returned by `Worker::stopIfNecessary()` as the exit status. `WorkerStopping` now gets an integer status, the reason, the connection and the queue.
 - CI: tests also run on Laravel 13.17.* and 13.30.*, the last releases before those `Worker` signature changes, and Composer no longer skips releases with security advisories, so `prefer-lowest` really tests 13.0.0 (it silently installed 13.30.0).
+- Fix: `RabbitMQQueue::declareExchange()` waits for RabbitMQ to confirm the declaration, so `isExchangeExists()` right after it no longer reports `false` now and then, and a rejected declaration fails right away instead of on a later operation.
 - Composer: the PHP constraint is now `^8.1`, the minimum of every supported Laravel version (it said `^8.0`, which could never resolve).
 - Dev: added Composer normalization, PHP 8.1+ compatibility (phpcs), phpstan and phpmd checks next to Pint, run in CI and documented in the README. phpstan and phpmd start from a baseline of the existing findings.
 

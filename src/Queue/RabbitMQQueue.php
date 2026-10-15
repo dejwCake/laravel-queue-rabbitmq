@@ -396,7 +396,9 @@ class RabbitMQQueue extends Queue implements QueueContract, RabbitMQQueueContrac
             $durable,
             $autoDelete,
             false,
-            true,
+            // Wait for Declare-Ok: RabbitMQ only orders commands within a channel, so with nowait
+            // isExchangeExists() on its temporary channel could still get a 404 for this exchange.
+            false,
             new AMQPTable($arguments)
         );
     }
