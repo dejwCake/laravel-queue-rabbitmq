@@ -8,6 +8,8 @@ format: ansi
 suffixes:
   - php
 baseline-file: phpmd.baseline.xml
+exclude-pattern:
+  - 'tests/*/__snapshots__/*.php'
 rules:
   - ref: rulesets/codesize.xml
   - ref: rulesets/controversial.xml

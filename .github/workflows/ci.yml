@@ -36,8 +36,6 @@ jobs:
             command: phpcs --standard=.phpcs.compatibility.xml --cache=.phpcs.cache
           - name: PHPStan
             command: phpstan analyse --configuration=phpstan.neon --no-progress --memory-limit=1G
-          - name: PHPMD
-            command: phpmd analyze --no-progress --format=github
 
     steps:
       - name: Checkout code
@@ -51,9 +49,29 @@ jobs:
       - name: Run ${{ matrix.name }}
         run: docker compose run --rm --no-deps -T php-qa ${{ matrix.command }}
 
+  phpmd:
+    name: 'QA: PHPMD'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install dependencies
+        run: >-
+          docker compose run --rm --no-deps -T php
+          composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Run PHPMD
+        run: |
+          status=0
+          docker compose run --rm --no-deps -T php-qa phpmd analyze --no-progress --format=github > phpmd-github.txt || status=$?
+          sed "s#file=/var/www/html/#file=#" phpmd-github.txt
+          exit $status
+
   tests:
     name: 'PHP ${{ matrix.php }} - Laravel: ${{ matrix.laravel }} - ${{ matrix.stability }}'
-    needs: [pint, qa]
+    needs: [pint, qa, phpmd]
     runs-on: ubuntu-latest
     # A consumer that misreads the Worker hooks loops forever instead of failing.
     timeout-minutes: 15
